@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sosal</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: large;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: white;
+            overflow: hidden;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px; /* Відстань між кнопками */
+            position: relative;
+        }
+        button {
+            background-color: pink;
+            font-size: large;
+            padding: 10px 20px;
+            border: 1px solid black;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, top 0.3s, left 0.3s;
+            position: relative;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            button {
+                font-size: medium;
+                padding: 8px 16px;
+            }
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Сосал?</h1>
+    <div class="buttons">
+        <button onclick="showFireworks()">Да</button>
+        <button id="noButton" onclick="runAway()">Нє</button>
+    </div>
+    
+    <canvas id="fireworksCanvas"></canvas>
+    <audio id="jokeSound" src="https://www.fesliyanstudios.com/play-mp3/336"></audio>
+
+    <script>
+        let noButton = document.getElementById("noButton");
+        let noClickCount = 0;
+
+        function runAway() {
+            noClickCount++;
+            if (noClickCount >= 2) {
+                let x = Math.random() * (window.innerWidth - 100);
+                let y = Math.random() * (window.innerHeight - 100);
+                noButton.style.position = "absolute";
+                noButton.style.left = x + "px";
+                noButton.style.top = y + "px";
+            } else {
+                alert('❌ ФАТАЛЬНА ПОМИЛКА!\nВи не можете обрати цей варіант! 😆');
+            }
+        }
+
+        function showFireworks() {
+            let audio = document.getElementById("jokeSound");
+            audio.play();
+
+            let canvas = document.getElementById("fireworksCanvas");
+            let ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+
+            function Particle(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.life = 50;
+            }
+
+            Particle.prototype.update = function () {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life--;
+            };
+
+            Particle.prototype.draw = function () {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            function createFireworks() {
+                let colors = ["red", "blue", "yellow", "green", "purple", "orange"];
+                
+                // Феєрверки зліва
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(50, Math.random() * window.innerHeight, colors[Math.floor(Math.random() * colors.length)]));
+                }
+
+                // Феєрверки справа
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(window.innerWidth - 50, Math.random() * window.innerHeight, colors[Math.floor(Math.random() * colors.length)]));
+                }
+            }
+
+            function animateFireworks() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(animateFireworks);
+            }
+
+            createFireworks();
+            animateFireworks();
+        }
+    </script>
+</body>
+</html>
+
+
+
